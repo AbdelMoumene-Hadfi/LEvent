@@ -42,6 +42,16 @@ int main() {
 
       }
     }
+    int event_nm;
+    printf("Entrer event number [0-%d] : ",count-1);
+    scanf("%d",&event_nm);
+    while(!(0<=event_nm && event_nm<count)) {
+      printf("Entrer event number [0-%d] : ",count-1);
+      scanf("%d",&event_nm);
+    }
+    sprintf(file_path,"/dev/input/event%d",event_nm);
+    printf("%s\n",file_path);
+
 
     closedir(fd_d);
     return EXIT_SUCCESS;
