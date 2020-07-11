@@ -28,15 +28,15 @@ int main() {
         strcpy(file_path,"/dev/input/");
         strcat(file_path,pDir->d_name);
         if((fd_f = open(file_path,O_RDONLY))<0) {
-          perror("enable to open file");
+          //perror("enable to open file");
           continue ;
         }
         if(ioctl(fd_f, EVIOCGNAME(sizeof(name)), name) < 0) {
-          perror("enable to control device");
+          //perror("enable to control device");
           close(fd_f);
           continue;
         }
-        printf("[%d] %s : %s\n",count,file_path,name);
+        printf("[%s] : %s\n",file_path,name);
         count++;
         close(fd_f);
 
@@ -50,8 +50,26 @@ int main() {
       scanf("%d",&event_nm);
     }
     sprintf(file_path,"/dev/input/event%d",event_nm);
-    printf("%s\n",file_path);
-
+    if((fd_f = open(file_path,O_RDONLY))<0) {
+      perror("enable to open file");
+      closedir(fd_d);
+      return EXIT_FAILURE;
+    }
+    int version;
+    if(ioctl(fd_f, EVIOCGVERSION, version) < 0) {
+      perror("enable to control device");
+      close(fd_f);
+      closedir(fd_d);
+      return EXIT_FAILURE;
+    }
+    printf("driver version is %d.%d.%d\n",version>>16,(version>>8)&0xff,version & 0xff);
+    if(ioctl(fd_f, EVIOCGNAME(sizeof(name)), name) < 0) {
+      perror("enable to control device");
+      close(fd_f);
+      closedir(fd_d);
+      return EXIT_FAILURE;
+    }
+    printf("%s\n",name);
 
     closedir(fd_d);
     return EXIT_SUCCESS;
