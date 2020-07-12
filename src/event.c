@@ -56,21 +56,20 @@ int main() {
       return EXIT_FAILURE;
     }
     int version;
-    if(ioctl(fd_f, EVIOCGVERSION, version) < 0) {
-      perror("enable to control device");
-      close(fd_f);
-      closedir(fd_d);
-      return EXIT_FAILURE;
+    if(ioctl(fd_f,EVIOCGVERSION,&version) < 0) {
+      perror("[ERROR] unable to get driver version");
     }
-    printf("driver version is %d.%d.%d\n",version>>16,(version>>8)&0xff,version & 0xff);
+    else {
+      printf("[INFO] driver_version : %d.%d.%d\n",version>>16,(version>>8)&0xff,version & 0xff);
+    }
     if(ioctl(fd_f, EVIOCGNAME(sizeof(name)), name) < 0) {
       perror("enable to control device");
-      close(fd_f);
-      closedir(fd_d);
-      return EXIT_FAILURE;
     }
-    printf("%s\n",name);
+    else {
+        printf("[INFO] name : %s\n",name);
+    }
 
+    close(fd_f);
     closedir(fd_d);
     return EXIT_SUCCESS;
 }
