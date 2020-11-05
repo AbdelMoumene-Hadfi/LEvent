@@ -117,7 +117,29 @@ int main() {
         }
       }
     }
-
+    printf("Listning to events :\n");
+    struct input_event ev[16];
+    int count_read=0;
+    while(1) {
+      count_read=read(fd_f,ev,sizeof(struct input_event)*16);
+      if (count_read < sizeof(struct input_event)) {
+        continue ;
+      }
+      for (int i=0;i<count_read/sizeof(struct input_event);i++) {
+        if(ev[i].type == EV_SYN) {
+          printf("Event: time %ld.%06ld, -------------- %s ------------\n",ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code ? "Config Sync" : "Report Sync" );
+        }
+        else if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN)) {
+				      printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %02x\n",ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
+	 	                  events[ev[i].type] ? events[ev[i].type] : "?",ev[i].code,
+					            names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",ev[i].value);
+			} else {
+				printf("Event: time %ld.%06ld, type %d (%s), code %d (%s), value %d\n",ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
+					events[ev[i].type] ? events[ev[i].type] : "?",ev[i].code,
+					names[ev[i].type] ? (names[ev[i].type][ev[i].code] ? names[ev[i].type][ev[i].code] : "?") : "?",ev[i].value);
+			  }
+      }
+    }
     close(fd_f);
     closedir(fd_d);
     return EXIT_SUCCESS;
